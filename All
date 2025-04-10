@@ -10,25 +10,25 @@ local SupportedExecutors = {
     ["XENO"] = true,
     ["CUBIX"] = true,
     ["AWP"] = true,
-    ["Wave"] = true,
+    ["WAVE"] = true,
 }
 
-local executor = identifyexecutor and identifyexecutor():upper() or "UNKNOWN"
-if not SupportedExecutors[executor] then
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "Shinichi Hub",
-        Text = "Executor không được hỗ trợ: " .. executor,
-        Duration = 6
-    })
-    return
+local executor = "UNKNOWN"
+if identifyexecutor then
+    local ok, result = pcall(identifyexecutor)
+    if ok and typeof(result) == "string" then
+        executor = result:upper()
+    end
 end
 
 if not SupportedExecutors[executor] then
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "Shinichi Hub",
-        Text = "Executor '" .. executor .. "' hiện không hỗ trợ.",
-        Duration = 6
-    })
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Shinichi Hub",
+            Text = "Executor không được hỗ trợ: " .. executor,
+            Duration = 6
+        })
+    end)
     return
 end
 
@@ -78,18 +78,36 @@ pcall(function()
 end)
 
 local function loadFrom(url)
-    loadstring(game:HttpGet(url))()
+    local success, response = pcall(function()
+        return game:HttpGet(url)
+    end)
+
+    if success and response and typeof(response) == "string" and #response > 0 then
+        local ok, err = pcall(function()
+            loadstring(response)()
+        end)
+        if not ok then
+            safeNotify("Shinichi Hub", "Lỗi khi chạy script!", 5)
+        end
+    else
+        safeNotify("Shinichi Hub", "Không thể tải script!", 5)
+    end
 end
 
 local placeId = game.PlaceId
-local gameName = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name:lower()
+local gameName = ""
+pcall(function()
+    gameName = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name:lower()
+end)
 
 if gameName:find("blox fruits") or placeId == 7449423635 or placeId == 2753915549 then
-    loadFrom("https://raw.githubusercontent.com/NewBetaLua/Shinichi/refs/heads/main/ShinichiHubMain")
+    loadFrom("https://raw.githubusercontent.com/NewBetaLua/Shinichi/main/ShinichiHubMain.lua")
 elseif gameName:find("dead raik") or placeId == 15376909604 then
     loadFrom("https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/main/deadrail.lua")
 elseif gameName:find("fisch") or placeId == 15517024339 then
     loadFrom("https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/main/fisch.lua")
 elseif gameName:find("blue lock") or placeId == 15516513985 then
     loadFrom("https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/main/bluelockdivals.lua")
+else
+    safeNotify("Shinichi Hub", "Game chưa được hỗ trợ.", 5)
 end
