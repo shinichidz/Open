@@ -1,0 +1,95 @@
+if _G.ScriptLoaded then return end
+_G.ScriptLoaded = true
+
+local SupportedExecutors = {
+    ["SWIFT"] = true,
+    ["FLUXUS"] = true,
+    ["DELTA"] = true,
+    ["CODE X"] = true,
+    ["KRNL"] = true,
+    ["XENO"] = true,
+    ["CUBIX"] = true,
+    ["AWP"] = true,
+    ["Wave"] = true,
+}
+
+local executor = identifyexecutor and identifyexecutor():upper() or "UNKNOWN"
+if not SupportedExecutors[executor] then
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Shinichi Hub",
+        Text = "Executor không được hỗ trợ: " .. executor,
+        Duration = 6
+    })
+    return
+end
+
+if not SupportedExecutors[executor] then
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Shinichi Hub",
+        Text = "Executor '" .. executor .. "' hiện không hỗ trợ.",
+        Duration = 6
+    })
+    return
+end
+
+local function safeNotify(title, text, duration)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = duration
+        })
+    end)
+end
+
+safeNotify("Shinichi Hub", "Made by Shinichi | Code by Baor", 5)
+
+if setclipboard then
+    setclipboard("https://discord.gg/pzsYhXKc3P")
+end
+
+pcall(function()
+    local gui = Instance.new("ScreenGui", game.CoreGui)
+    gui.Name = "ShinichiNotify"
+
+    local img = Instance.new("ImageLabel", gui)
+    img.Size = UDim2.new(1, 0, 1, 0)
+    img.Image = "rbxassetid://78774998900413"
+    img.BackgroundTransparency = 1
+    img.ImageTransparency = 0
+
+    local label = Instance.new("TextLabel", gui)
+    label.Size = UDim2.new(1, 0, 0.1, 0)
+    label.Position = UDim2.new(0, 0, 0.45, 0)
+    label.Text = "Shinichi Hub"
+    label.TextColor3 = Color3.new(1,1,1)
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.GothamBold
+    label.TextScaled = true
+
+    task.delay(3, function()
+        for i = 0, 1, 0.05 do
+            img.ImageTransparency = i
+            label.TextTransparency = i
+            wait(0.03)
+        end
+        gui:Destroy()
+    end)
+end)
+
+local function loadFrom(url)
+    loadstring(game:HttpGet(url))()
+end
+
+local placeId = game.PlaceId
+local gameName = game:GetService("MarketplaceService"):GetProductInfo(placeId).Name:lower()
+
+if gameName:find("blox fruits") or placeId == 7449423635 or placeId == 2753915549 then
+    loadFrom("https://raw.githubusercontent.com/NewBetaLua/Shinichi/refs/heads/main/ShinichiHubMain")
+elseif gameName:find("dead raik") or placeId == 15376909604 then
+    loadFrom("https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/main/deadrail.lua")
+elseif gameName:find("fisch") or placeId == 15517024339 then
+    loadFrom("https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/main/fisch.lua")
+elseif gameName:find("blue lock") or placeId == 15516513985 then
+    loadFrom("https://raw.githubusercontent.com/shinichi-dz/phucshinsayhi/main/bluelockdivals.lua")
+end
